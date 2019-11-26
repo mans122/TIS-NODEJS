@@ -1,0 +1,29 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.1.1.js"></script>
+    <script>
+        $(document).ready(function () {
+            $.ajax('https://api.github.com/users/jquery/repos', {
+                dataType: 'jsonp',
+                success: function (input) {
+                    $.each(input.data, function (index, item) {
+                        // 문서 객체를 생성합니다.
+                        var a = $('<h2></h2>').html(item.name);
+                        var b = $('<a></a>')
+                            .attr('href', item.html_url)
+                            .html(item.html_url);
+                        var c = $('<hr />')
+                        
+                        // body 태그에 내용을 추가합니다.
+                        $('<div></div>').append(a, b, c).appendTo('body');
+                    });
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+
+</body>
+</html>

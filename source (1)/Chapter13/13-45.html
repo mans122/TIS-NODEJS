@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="http://code.jquery.com/jquery-3.1.1.js"></script>
+    <script>
+        // 함수를 선언합니다.
+        function test(options) {
+            // 옵션 객체를 초기화합니다.
+            options = $.extend({
+                // 기본 값
+                valueA: 10,
+                valueB: 20,
+                valueC: 30
+            }, options);
+            // 출력합니다.
+            alert(options.valueA + ':' + options.valueB + ':' + options.valueC);
+        }
+        // 함수를 호출합니다.
+        test({
+            valueA: 52,
+            valueC: 273
+        });
+    </script>
+</head>
+<body>
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>XMLHttpRequest</title>
+</head>
+<body>
+    <script>
+        // XMLHttpRequest 객체를 생성합니다.
+        var request = new XMLHttpRequest();
+        request.onreadystatechange = function (event) {
+            if (request.readyState == 4) {
+                if (request.status == 200) {
+                    var json = eval('(' + request.responseText + ')');
+                };
+            };
+        };
+        request.open('GET', '/data.json', true);
+        request.send();
+    </script>
+</body>
+</html>
