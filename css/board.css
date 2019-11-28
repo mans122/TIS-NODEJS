@@ -1,0 +1,33 @@
+#warp{
+	width:971px;
+	margin: 0;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+h1{ color: green;}
+table {
+	width: 100%;
+	border-collapse:collapse; /*테이블의 border를 1줄로나오게 해주는 코드*/
+	font-size: 12px;
+	line-height: 24px;
+}
+table td,th{
+	border:1px solid #d3d3d3;
+	padding: 5px;
+}
+th{
+	background: yellowgreen;
+}
+img{
+	width:220px;
+	height: 300px;
+}
+a{
+	text-decoration: none;
+	color:black;
+}
+a:hover {
+	text-decoration: underline;
+	color:green;
+}
