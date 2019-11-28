@@ -55,8 +55,7 @@ app.post('/insert',function(request,response){
     if(month<10){ month="0"+month; } // 01월 02월 이렇게 2자리 맞춰주기 위한 코드
     var ymd = year+"-"+month+"-"+date;
     //db query 실행
-    client.query('insert into board(title, content, wdate) values(?, ?, ?)',
-    [body.title, body.content, ymd],function(){
+    client.query('insert into board(title, content, wdate) values(?, ?, ?)',[body.title, body.content, ymd],function(){
         //응답합니다.
         response.redirect('/'); // 목록으로 이동
     });
@@ -66,6 +65,29 @@ app.post('/insert',function(request,response){
 app.get('/content/:id',function(request,response){
     //파일을 읽습니다
     fs.readFile('board_content.html','utf8',function(error,data){
+        //query실행
+        client.query('select * from board where id= ?',request.params.id,function(error,result1){
+            client.query('select * from board_repl where parent_id=?',request.params.id,function(error,result2){
+                response.send(ejs.render(data,{
+                    data:result1[0],
+                    data2:result2
+                }));
+            });
+        });
+    });
+});
+
+//삭제
+app.get('/delete/:id',function(request,response){
+   client.query('delete from board where id=?',request.params.id,function(error,request){
+       response.redirect('/');
+   });
+});
+
+//edit 링크 클릭시
+app.get('/edit/:id',function(request,response){
+    //파일을 읽습니다
+    fs.readFile('board_edit.html','utf8',function(error,data){
         //query실행
         client.query('select * from board where id= ?',request.params.id,function(error,result){
             //응답 및 데이터보내줌
@@ -78,9 +100,48 @@ app.get('/content/:id',function(request,response){
     });
 });
 
-//삭제
-app.get('/delete/:id',function(request,response){
-   client.query('delete from board where id=?',request.params.id,function(error,request){
-       response.redirect('/');
-   });
+//edit.html에서에 데이터 입력 후 submit 버튼을 눌렀을 때
+app.post('/edit/:id',function(request,response){
+    var body=request.body;
+    var id = request.params.id;
+    //db query 실행
+    client.query('update board set title=?, content=?, wdate=? where id=?',
+    [body.title, body.content, body.wdate, id],function(){
+        //응답합니다.
+        response.redirect('/'); // 목록으로 이동
+    });
 });
+
+
+//댓글등록
+app.post('/repl_insert/:id',function(request,response){
+    var d=new Date(); 
+    var year=d.getFullYear(); //년도
+    var month=d.getMonth()+1; //월 , +1해야 현재 월
+    var date=d.getDate(); // 일
+    if(month<10){ month="0"+month; } // 01월 02월 이렇게 2자리 맞춰주기 위한 코드
+    var ymd = year+"-"+month+"-"+date;
+    //db query 실행
+    client.query('insert into board_repl(parent_id,content,wdate) values(?,?,?)',[request.params.id, request.body.repl_content, ymd],function(){
+        response.redirect('/content/'+request.params.id); // 목록으로 이동
+    });
+});
+
+//댓글 삭제
+app.get('/repl_delete/:id/:pid',function(request,response){
+    var pid = request.params.pid;
+    client.query('delete from board_repl where id=?',request.params.id,function(error,request){
+        response.redirect('/content/'+pid); // 목록으로 이동
+    });
+})
+
+//댓글 업데이트
+app.post('/repl_update/:id/:pid',function(request,response){
+    var id = request.params.id;
+    var pid = request.params.pid;
+    eval("var repl_content = request.body.repl_content_"+id);
+    console.log(repl_content);    
+    client.query('update board_repl set content=? where id=?',[repl_content, id],function(error,request){
+        response.redirect('/content/'+pid); // 목록으로 이동
+    });
+})
