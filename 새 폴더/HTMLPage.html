@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('a').click(function(e){
+                if($('#name').val().length==0){
+                    alert("닉네임을 입력해주세요.");
+                    return false;
+                }
+            });
+            var socket = io.connect();
+            //이벤트 연결 , 사용자정의 이벤트 명 message
+            socket.on('message', function (data) {
+                //추가할 문자열 생성
+                var msg = 'recieve';
+                if($('#name').val()==data.name){
+                    msg= 'send';
+                }
+                var output = '';
+                output += '<div id="msg" class="'+msg+'">';
+                output += '<span>'    
+                output += '    <h3 class="nick">' + data.name + '</h3>';
+                output += '    <p class="content">' + data.message + '</p>';
+                output += '    <p class="date">' + data.date + '</p>';
+                output += '</span>'    
+                output += '</div>';
+
+                //문서 객체 추가
+                $(output).appendTo('#content');
+                //스크롤 맨밑으로 이동
+                $(document).scrollTop($(document).height());
+            });
+            //버튼 클릭할 때 메시지 전송
+            $(document).keydown(function(key) {
+                var now = new Date();
+                var y = now.getFullYear();
+                var m = now.getMonth()+1;
+                var d = now.getDate();
+                var h = now.getHours();
+                var mm = now.getMinutes();
+                var sendtime = y+"년 "+m+"월 "+d+"일 "+h+":"+mm;
+                if (key.keyCode == 13) {
+                    socket.emit('message', {
+                    name: $('#name').val(),
+                    message: $('#message').val(),
+                    date : sendtime
+                    
+                });
+                $('#message').val('');
+                $('#message').focus();
+                }
+            });
+
+            $('#button').click(function () {
+                var now = new Date();
+                var y = now.getFullYear();
+                var m = now.getMonth()+1;
+                var d = now.getDate();
+                var h = now.getHours();
+                var mm = now.getMinutes();
+                var sendtime = y+"년 "+m+"월 "+d+"일 "+h+":"+mm;
+                socket.emit('message', {
+                    name: $('#name').val(),
+                    message: $('#message').val(),
+                    date: sendtime
+                });
+                $('#message').val('');
+                $('#message').focus();
+            });
+        });
+    </script>
+    <style>
+        #msg{margin-bottom: 30px;}
+        #msg span{
+            display: inline-block;
+            border-radius: 5px;
+            padding: 0 5px 0 5px;
+            background: skyblue;
+            text-shadow: none;
+        }
+        .receive {text-align: left;}
+        .send {text-align: right;}
+        .nick{font-size: 1.3em; border-bottom: 1px solid black; padding-bottom: 3px;}
+    
+        .date{font-size: 0.5em; border-top: 1px solid black; padding-top: 5px;}
+    </style>
+</head>
+
+<body>
+    <div data-role="page" id="intro">
+        <div data-role="header">
+            <h1>채팅</h1>
+        </div>
+        <div data-role="content">
+            <h3>닉네임을 입력해주세요</h3>
+            <input id="name" placeholder="닉네임">
+            <a href="#chatpage" data-role="button" onclick="nickcheck()">Start Chat</a>
+            
+        </div>
+    </div>
+
+    <div data-role="page" id="chatpage"  style="padding-top: 50px;">
+            <div data-role="header" style="position: fixed; width: 100%; top: 0;">
+                <h1>채팅</h1>
+            </div>
+            <div data-role="content">
+                <!-- jQuery Mobile에서는 ul 태그나 ol 태그 같은 리스트 태그의 data-role 속성을 listview로 입력하면 스마트폰의 리스트와 같은 모습으로 바꿀 수 있다. -->
+                <!-- 리스트를 하나의 그룹으로 구분하고 싶을 때는 data-inset 속성을 true로 입력합니다. -->
+                <div id="content"></div>
+                <input id="message">
+                    <button id="button">전송</button>
+            </div>  
+    </div>
+</body>
+</html>
+
